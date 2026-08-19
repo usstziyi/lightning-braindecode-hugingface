@@ -9,4 +9,5 @@ dependencies = [
     # 启用模型的 push_to_hub / from_pretrained 以及数据集的 Hub 集成；
     # moabb 用于下载和加载公开 EEG 数据集（如 BCIC IV 2a）。
     "braindecode[hub,moabb]>=1.7,<2",
+    "rich>=15.0.0",
 ]

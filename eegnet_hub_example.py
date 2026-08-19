@@ -157,12 +157,14 @@ def push_demo(repo_id: str, subject_id: int, max_epochs: int) -> None:
     print("      推送完成:", f"https://huggingface.co/{repo_id}")
 
     print("[回读] from_pretrained() 重新加载并验证 ...")
-    loaded = EEGNet.from_pretrained(repo_id)
+    device = next(clf.module_.parameters()).device  # 与训练设备一致（cuda/mps/cpu）
+    # safetensors 的 map_location 不支持 mps，故先加载到 cpu 再移到目标设备
+    loaded = EEGNet.from_pretrained(repo_id, map_location="cpu").to(device)
     clf.module_.eval()
     loaded.eval()
 
     with torch.no_grad():
-        x = torch.randn(2, model.n_chans, model.n_times)
+        x = torch.randn(2, model.n_chans, model.n_times, device=device)
         out_orig = clf.module_(x)
         out_loaded = loaded(x)
 
