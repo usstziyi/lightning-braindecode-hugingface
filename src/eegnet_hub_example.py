@@ -29,10 +29,6 @@ def get_device():
     else:
         return torch.device("cpu")
 
-def hub_logged_in():
-    token = os.environ.get("HF_TOKEN")
-    if token:
-        login(token=token)
 
 
 def train_model():
@@ -102,8 +98,6 @@ def train_model():
 
 
 def push_model(model: EEGNet):
-    hub_logged_in()
-
     # 权重会保存为 model.safetensors / pytorch_model.bin，
     # 所有 EEGNet 的 __init__ 签名参数，会随 config.json 一起上传。
     model.push_to_hub(
@@ -113,7 +107,6 @@ def push_model(model: EEGNet):
     )
 
 def load_model(repo_id: str):
-    hub_logged_in()
     device = get_device()
     model = EEGNet.from_pretrained(
         repo_id, 
