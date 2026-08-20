@@ -26,7 +26,6 @@ import argparse
 import os
 
 import torch
-from numpy import multiply
 from huggingface_hub import login
 
 from braindecode import EEGClassifier
@@ -35,8 +34,9 @@ from braindecode.models import EEGNet
 from braindecode.preprocessing import (
     Filter,
     PickTypes,
-    Resample,
     Preprocessor,
+    Resample,
+    Rescale,
     create_windows_from_events,
     exponential_moving_standardize,
     preprocess,
@@ -52,14 +52,11 @@ def train_evaluate(subject_id: int, max_epochs: int):
     dataset = MOABBDataset(dataset_name="BNCI2014_001", subject_ids=[subject_id])
 
     # 2) 预处理：保留 EEG 通道、V→µV、4–38 Hz 带通、重采样到 128 Hz、指数移动标准化
-    def scale_to_microvolt(data):
-        return multiply(data, 1e6)
-
     preprocess(
         dataset,
         [
             PickTypes(eeg=True, stim=False, verbose=False),
-            Preprocessor(scale_to_microvolt),
+            Rescale(scalings={"eeg": 1e6}),  # V→µV（mne.io.Raw.rescale 包装，可序列化）
             Filter(l_freq=4.0, h_freq=38.0, verbose=False),
             Resample(sfreq=128, verbose=False),
             Preprocessor(
