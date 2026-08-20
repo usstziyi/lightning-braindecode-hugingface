@@ -16,6 +16,7 @@
 
 from __future__ import annotations
 
+from numpy import False_
 import torch
 
 from braindecode.datasets import MOABBDataset
