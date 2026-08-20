@@ -2,6 +2,7 @@ from huggingface_hub import login
 from huggingface_hub import auth_list
 from huggingface_hub import auth_switch
 from huggingface_hub import HfApi, get_token
+from huggingface_hub import auth_check
 
 # 登录
 # login(token="hf_xxx")                              # 直接传 token
@@ -10,7 +11,7 @@ login()                                             # 浏览器 OAuth / 手动�
 # login(skip_if_logged_in=False)                      # 强制重新登录
 
 # 获取当前登录的token
-token = get_token()
+# token = get_token()
 # print(f"当前登录的token:={token}")
 
 # 查看本地所有token
@@ -28,11 +29,16 @@ for key, value in info.items():
     print(f"{key}: {value}")
 
 
-# 检查读写权限
-tok = info["auth"]["accessToken"]
-perms = tok.get("fineGrained", {}).get("scoped", [])
-can_write = any("repo.write" in p["permissions"] for p in perms)
-print(f"user={info['name']} token={tok['displayName']} role={tok['role']} can_write={can_write}")
+# # 检查读写权限
+# tok = info["auth"]["accessToken"]
+# perms = tok.get("fineGrained", {}).get("scoped", [])
+# can_write = any("repo.write" in p["permissions"] for p in perms)
+# print(f"user={info['name']} token={tok['displayName']} role={tok['role']} can_write={can_write}")
 
-can_read = any("repo.access.read" in p["permissions"] for p in perms)
-print(f"user={info['name']} token={tok['displayName']} role={tok['role']} can_read={can_read}")
+# can_read = any("repo.access.read" in p["permissions"] for p in perms)
+# print(f"user={info['name']} token={tok['displayName']} role={tok['role']} can_read={can_read}")
+
+
+# 检查当前 token 对指定仓库是否有访问权限（成功返回 None；无权限/仓库不存在则抛异常）
+check = auth_check("usst-ziyi/eegnet-bnci2014-001",write=True)
+print(check)
